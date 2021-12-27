@@ -1,0 +1,34 @@
+mermaid = {
+  SOI ~
+  whitespace_or_newline* ~
+  diagram ~
+  whitespace_or_newline* ~
+  EOI
+}
+
+WHITESPACE = _{ " " | "\t" }
+whitespace_or_newline = _{ WHITESPACE | NEWLINE }
+
+diagram = _{ pie_diagram }
+
+// pie chart
+pie_diagram = {
+  "pie" ~ whitespace_or_newline? ~
+  pie_title? ~ NEWLINE? ~
+  pie_entry? ~ (whitespace_or_newline+ ~ pie_entry)*
+}
+pie_title = { "title" ~ pie_title_value ~ NEWLINE }
+pie_title_value = { (!NEWLINE ~ ANY)* }
+pie_entry = { string ~ ":" ~ number }
+
+// number
+number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+
+// json string
+string = ${ "\"" ~ string_inner ~ "\"" }
+string_inner = @{ char* }
+char = {
+  !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
