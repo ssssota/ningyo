@@ -18,17 +18,19 @@ pub fn parse<'a>(pair: Pair<'a, Rule>) -> Result<Diagram<'a>, Error<Rule>> {
                     pairs.next().unwrap().as_str().parse().unwrap(),
                 ))
             }
-            Rule::EOI => todo!(),
-            Rule::mermaid => todo!(),
-            Rule::WHITESPACE => todo!(),
-            Rule::whitespace_or_newline => todo!(),
-            Rule::diagram => todo!(),
-            Rule::pie_diagram => todo!(),
-            Rule::pie_title_value => todo!(),
-            Rule::number => todo!(),
-            Rule::string => todo!(),
-            Rule::string_inner => todo!(),
-            Rule::char => todo!(),
+            Rule::EOI
+            | Rule::mermaid
+            | Rule::WHITESPACE
+            | Rule::whitespace_or_newline
+            | Rule::info
+            | Rule::info_show
+            | Rule::diagram
+            | Rule::pie_diagram
+            | Rule::pie_title_value
+            | Rule::number
+            | Rule::string
+            | Rule::string_inner
+            | Rule::char => unreachable!("in pie"),
         }
     }
     Ok(Diagram::Pie { title, entries })

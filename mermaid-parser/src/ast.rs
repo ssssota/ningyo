@@ -4,5 +4,7 @@ pub enum Diagram<'a> {
         title: Option<&'a str>,
         entries: Vec<(&'a str, f64)>,
     },
-    None,
+    Info {
+        show_info: bool,
+    },
 }

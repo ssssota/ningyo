@@ -1,3 +1,4 @@
+mod info;
 mod pie;
 
 use crate::ast::Diagram;
@@ -18,17 +19,19 @@ pub fn parse(mermaid: &str) -> Result<Diagram, Error<Rule>> {
 
     match pair.as_rule() {
         Rule::pie_diagram => pie::parse(pair),
-        Rule::EOI => panic!("not impl"),
-        Rule::mermaid => panic!("not impl"),
-        Rule::WHITESPACE => panic!("not impl"),
-        Rule::whitespace_or_newline => panic!("not impl"),
-        Rule::pie_title => panic!("not impl"),
-        Rule::pie_title_value => panic!("not impl"),
-        Rule::pie_entry => panic!("not impl"),
-        Rule::number => panic!("not impl"),
-        Rule::string => panic!("not impl"),
-        Rule::string_inner => panic!("not impl"),
-        Rule::char => panic!("not impl"),
-        Rule::diagram => unreachable!(),
+        Rule::info => info::parse(pair),
+        Rule::EOI
+        | Rule::mermaid
+        | Rule::WHITESPACE
+        | Rule::whitespace_or_newline
+        | Rule::info_show
+        | Rule::pie_title
+        | Rule::pie_title_value
+        | Rule::pie_entry
+        | Rule::number
+        | Rule::string
+        | Rule::string_inner
+        | Rule::char
+        | Rule::diagram => unreachable!(),
     }
 }

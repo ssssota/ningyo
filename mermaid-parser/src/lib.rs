@@ -88,3 +88,31 @@ mod pie_chart_test {
         }
     }
 }
+
+#[cfg(test)]
+mod info_test {
+    use crate::parse;
+    use crate::Diagram::Info;
+
+    #[test]
+    fn basic_info() {
+        let info = parse("info").unwrap();
+        match info {
+            Info { show_info } => {
+                assert_eq!(show_info, false);
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    #[test]
+    fn show_info() {
+        let info = parse("info showInfo").unwrap();
+        match info {
+            Info { show_info } => {
+                assert_eq!(show_info, true);
+            }
+            _ => unreachable!(),
+        }
+    }
+}

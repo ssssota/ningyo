@@ -9,7 +9,7 @@ mermaid = {
 WHITESPACE = _{ " " | "\t" }
 whitespace_or_newline = _{ WHITESPACE | NEWLINE }
 
-diagram = _{ pie_diagram }
+diagram = _{ pie_diagram | info }
 
 // pie chart
 pie_diagram = {
@@ -20,6 +20,10 @@ pie_diagram = {
 pie_title = { "title" ~ pie_title_value ~ NEWLINE }
 pie_title_value = { (!NEWLINE ~ ANY)* }
 pie_entry = { string ~ ":" ~ number }
+
+// info
+info = { "info" ~ info_show? }
+info_show = { "showInfo" }
 
 // number
 number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
