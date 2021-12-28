@@ -5,114 +5,82 @@ extern crate pest_derive;
 mod ast;
 mod diagram;
 
-pub use ast::Diagram;
+pub use ast::DiagramTerm;
 pub use diagram::parse;
 
 #[cfg(test)]
 mod pie_chart_test {
     use crate::parse;
-    use crate::Diagram::Pie;
+    use crate::DiagramTerm;
 
     #[test]
     fn basic_pie() {
-        let pie = parse(
+        let terms = parse(
             r#"
+                # pie chart
                 pie title Language
-                "Rust": 80
+                "Rust": 80 # major language
                 "TypeScript": 20
             "#,
         )
         .unwrap();
-        match pie {
-            Pie { title, entries } => {
-                assert_eq!(title, Some("Language"));
-                assert_eq!(entries, vec![("Rust", 80.0), ("TypeScript", 20.0),]);
+        assert_eq!(
+            terms[0],
+            DiagramTerm::Comment {
+                content: "pie chart",
+                posision: (17, 28)
             }
-            _ => unreachable!(),
-        }
-    }
-
-    #[test]
-    fn line_title() {
-        let pie = parse(
-            r#"
-                pie
-                title Language Usage Rate
-                "Rust": 52
-                "TypeScript": 13
-            "#,
-        )
-        .unwrap();
-        match pie {
-            Pie { title, entries } => {
-                assert_eq!(title, Some("Language Usage Rate"));
-                assert_eq!(entries, vec![("Rust", 52.0), ("TypeScript", 13.0)]);
+        );
+        assert_eq!(terms[1], DiagramTerm::Pie((45, 48)));
+        assert_eq!(
+            terms[2],
+            DiagramTerm::Title {
+                content: "Language",
+                posision: (49, 63)
             }
-            _ => unreachable!(),
-        }
-    }
-
-    #[test]
-    fn notitle() {
-        let pie = parse(
-            r#"
-                pie
-                "Rust": 0.8
-                "TypeScript": 0.2
-            "#,
-        )
-        .unwrap();
-        match pie {
-            Pie { title, entries } => {
-                assert_eq!(title, None);
-                assert_eq!(entries, vec![("Rust", 0.8), ("TypeScript", 0.2),]);
+        );
+        assert_eq!(
+            terms[3],
+            DiagramTerm::PieEntry {
+                name: "Rust",
+                value: 80.0,
+                position: (80, 90)
             }
-            _ => unreachable!(),
-        }
-    }
-
-    #[test]
-    fn noentry() {
-        let pie = parse(
-            r#"
-                pie title Language Usage Rate
-            "#,
-        )
-        .unwrap();
-        match pie {
-            Pie { title, entries } => {
-                assert_eq!(title, Some("Language Usage Rate"));
-                assert_eq!(entries, vec![]);
+        );
+        assert_eq!(
+            terms[4],
+            DiagramTerm::Comment {
+                content: "major language",
+                posision: (91, 107)
             }
-            _ => unreachable!(),
-        }
+        );
+        assert_eq!(
+            terms[5],
+            DiagramTerm::PieEntry {
+                name: "TypeScript",
+                value: 20.0,
+                position: (124, 140)
+            }
+        );
     }
 }
 
 #[cfg(test)]
 mod info_test {
     use crate::parse;
-    use crate::Diagram::Info;
-
-    #[test]
-    fn basic_info() {
-        let info = parse("info").unwrap();
-        match info {
-            Info { show_info } => {
-                assert_eq!(show_info, false);
-            }
-            _ => unreachable!(),
-        }
-    }
+    use crate::DiagramTerm;
 
     #[test]
     fn show_info() {
-        let info = parse("info showInfo").unwrap();
-        match info {
-            Info { show_info } => {
-                assert_eq!(show_info, true);
+        let terms = parse("info showInfo # comment").unwrap();
+        assert_eq!(terms[0], DiagramTerm::Info((0, 4)));
+        assert_eq!(terms[1], DiagramTerm::ShowInfo((5, 13)));
+        assert_eq!(
+            terms[2],
+            DiagramTerm::Comment {
+                content: "comment",
+                posision: (14, 23)
             }
-            _ => unreachable!(),
-        }
+        )
     }
 }

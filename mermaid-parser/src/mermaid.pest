@@ -1,35 +1,43 @@
 mermaid = {
   SOI ~
-  whitespace_or_newline* ~
+  comment_or_newline* ~
   diagram ~
-  whitespace_or_newline* ~
+  comment_or_newline* ~
+  comment? ~
   EOI
 }
 
 WHITESPACE = _{ " " | "\t" }
-whitespace_or_newline = _{ WHITESPACE | NEWLINE }
+comment_or_newline = _{ comment? ~ NEWLINE }
 
 diagram = _{ pie_diagram | info }
 
 // pie chart
-pie_diagram = {
-  "pie" ~ whitespace_or_newline? ~
-  pie_title? ~ NEWLINE? ~
-  pie_entry? ~ (whitespace_or_newline+ ~ pie_entry)*
+pie_diagram = _{
+  pie_start ~ comment_or_newline? ~
+  pie_title? ~ comment_or_newline+ ~
+  pie_entry? ~ (comment_or_newline+ ~ pie_entry)*
 }
-pie_title = { "title" ~ pie_title_value ~ NEWLINE }
-pie_title_value = { (!NEWLINE ~ ANY)* }
-pie_entry = { string ~ ":" ~ number }
+pie_start = { "pie" }
+pie_title = { "title" ~ pie_title_value }
+pie_title_value = { (!(NEWLINE | comment_start) ~ ANY)* }
+pie_entry = { quoted_string ~ ":" ~ number }
 
 // info
-info = { "info" ~ info_show? }
+info = _{ info_start ~ info_show? }
+info_start = { "info" }
 info_show = { "showInfo" }
+
+// comment
+comment = { comment_start ~ comment_inner }
+comment_start = _{ "#" }
+comment_inner = { (!NEWLINE ~ ANY)* }
 
 // number
 number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 
 // json string
-string = ${ "\"" ~ string_inner ~ "\"" }
+quoted_string = ${ "\"" ~ string_inner ~ "\"" }
 string_inner = @{ char* }
 char = {
   !("\"" | "\\") ~ ANY

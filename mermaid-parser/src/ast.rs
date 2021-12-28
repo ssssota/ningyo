@@ -1,10 +1,24 @@
+type Pos = (usize, usize);
+
 #[derive(Debug, PartialEq)]
-pub enum Diagram<'a> {
-    Pie {
-        title: Option<&'a str>,
-        entries: Vec<(&'a str, f64)>,
+pub enum DiagramTerm<'a> {
+    // common
+    Title {
+        content: &'a str,
+        posision: Pos,
     },
-    Info {
-        show_info: bool,
+    Comment {
+        content: &'a str,
+        posision: Pos,
     },
+    // pie chart
+    Pie(Pos),
+    PieEntry {
+        name: &'a str,
+        value: f64,
+        position: Pos,
+    },
+    // info
+    Info(Pos),
+    ShowInfo(Pos),
 }
