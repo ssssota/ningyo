@@ -24,15 +24,36 @@ pub fn parse(mermaid: &str) -> Result<Vec<DiagramTerm>, Error<Rule>> {
         let span = pair.as_span();
         match pair.as_rule() {
             Rule::mermaid => pair.into_inner().rev().for_each(|p| queue.push_front(p)),
-            Rule::pie_start => {
-                pair.into_inner().rev().for_each(|p| queue.push_front(p));
-                result.push(DiagramTerm::Pie(span_to_pos(&span)));
-            }
-            Rule::pie_title => {
+            Rule::title => {
                 result.push(DiagramTerm::Title {
                     content: pair.into_inner().next().unwrap().as_str(),
                     posision: span_to_pos(&span),
                 });
+            }
+            Rule::journey_start => {
+                result.push(DiagramTerm::Journey(span_to_pos(&span)));
+            }
+            Rule::journey_entry => {
+                let mut entry = pair.into_inner();
+                let name = entry.next().unwrap().as_str();
+                let value: f64 = entry.next().unwrap().as_str().parse().unwrap();
+                let mut users = vec![];
+                entry.for_each(|p| users.push(p.as_str()));
+                result.push(DiagramTerm::JourneyEntry {
+                    name,
+                    value,
+                    users,
+                    position: span_to_pos(&span),
+                });
+            }
+            Rule::journey_section => {
+                result.push(DiagramTerm::JourneySection {
+                    name: pair.into_inner().next().unwrap().as_str(),
+                    position: span_to_pos(&span),
+                });
+            }
+            Rule::pie_start => {
+                result.push(DiagramTerm::Pie(span_to_pos(&span)));
             }
             Rule::pie_entry => {
                 let mut entry = pair.into_inner();
@@ -60,11 +81,16 @@ pub fn parse(mermaid: &str) -> Result<Vec<DiagramTerm>, Error<Rule>> {
             | Rule::quoted_string
             | Rule::string_inner
             | Rule::char
-            | Rule::pie_title_value
+            | Rule::until_comment_or_newline
             | Rule::comment_inner
             | Rule::comment_start
             | Rule::comment_or_newline
             | Rule::diagram
+            | Rule::journey_diagram
+            | Rule::journey_entry_separator
+            | Rule::journey_entry_users
+            | Rule::journey_entry_user
+            | Rule::journey_entry_name
             | Rule::pie_diagram
             | Rule::info
             | Rule::WHITESPACE => unreachable!(),
