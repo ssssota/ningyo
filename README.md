@@ -12,7 +12,7 @@ Rust implementaion for [mermaid(js)](http://mermaid-js.github.io/mermaid/).
   - [ ] Class Diagram
   - [ ] State Diagram
   - [ ] Entity Relationship Diagram
-  - [ ] User Journey
+  - [x] User Journey
   - [ ] Gantt
   - [x] Pie Chart
   - [ ] Requirement Diagram
