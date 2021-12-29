@@ -64,7 +64,6 @@ pub fn parse(mermaid: &str) -> Result<Vec<DiagramTerm>, Error<Rule>> {
                 });
             }
             Rule::info_start => {
-                pair.into_inner().rev().for_each(|p| queue.push_front(p));
                 result.push(DiagramTerm::Info(span_to_pos(&span)));
             }
             Rule::info_show => {
