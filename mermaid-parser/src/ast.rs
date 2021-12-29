@@ -11,6 +11,18 @@ pub enum DiagramTerm<'a> {
         content: &'a str,
         posision: Pos,
     },
+    // user journey
+    Journey(Pos),
+    JourneyEntry {
+        name: &'a str,
+        value: f64,
+        users: Vec<&'a str>,
+        position: Pos,
+    },
+    JourneySection {
+        name: &'a str,
+        position: Pos,
+    },
     // pie chart
     Pie(Pos),
     PieEntry {
