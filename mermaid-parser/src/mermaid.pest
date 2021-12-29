@@ -10,18 +10,37 @@ mermaid = {
 WHITESPACE = _{ " " | "\t" }
 comment_or_newline = _{ comment? ~ NEWLINE }
 
-diagram = _{ pie_diagram | info }
+diagram = _{ journey_diagram | pie_diagram | info }
+
+// user journey
+journey_diagram = _{
+  journey_start ~ comment_or_newline? ~
+  title? ~ comment_or_newline? ~
+  (journey_entry | journey_section)? ~
+  (comment_or_newline+ ~ (journey_entry | journey_section))*
+}
+journey_start = { "journey" }
+journey_entry_separator = _{ ":" }
+journey_entry = {
+  journey_entry_name ~ journey_entry_separator ~ number ~
+  (journey_entry_separator ~ journey_entry_users)?
+}
+journey_entry_name = { (!(NEWLINE | comment_start | journey_entry_separator) ~ ANY)+ }
+journey_entry_users = _{ journey_entry_user ~ ("," ~ journey_entry_user)* }
+journey_entry_user = { (!(NEWLINE | comment_start | ",") ~ ANY)+ }
+journey_section = { "section" ~ until_comment_or_newline }
 
 // pie chart
 pie_diagram = _{
   pie_start ~ comment_or_newline? ~
-  pie_title? ~ comment_or_newline+ ~
+  title? ~ comment_or_newline+ ~
   pie_entry? ~ (comment_or_newline+ ~ pie_entry)*
 }
 pie_start = { "pie" }
-pie_title = { "title" ~ pie_title_value }
-pie_title_value = { (!(NEWLINE | comment_start) ~ ANY)* }
 pie_entry = { quoted_string ~ ":" ~ number }
+
+// title
+title = { "title" ~ until_comment_or_newline }
 
 // info
 info = _{ info_start ~ info_show? }
@@ -32,6 +51,8 @@ info_show = { "showInfo" }
 comment = { comment_start ~ comment_inner }
 comment_start = _{ "#" }
 comment_inner = { (!NEWLINE ~ ANY)* }
+
+until_comment_or_newline = { (!(NEWLINE | comment_start) ~ ANY)* }
 
 // number
 number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }

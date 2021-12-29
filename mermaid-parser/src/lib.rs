@@ -9,12 +9,66 @@ pub use ast::DiagramTerm;
 pub use diagram::parse;
 
 #[cfg(test)]
-mod pie_chart_test {
-    use crate::parse;
-    use crate::DiagramTerm;
+mod tests {
+    use super::*;
 
     #[test]
-    fn basic_pie() {
+    fn journey() {
+        let terms = parse(
+            r#"
+                # user journey
+                journey
+                title Daily tasks
+                Take a bread: 5: Me
+                section At the office
+                sleep: 0.1
+            "#,
+        )
+        .unwrap();
+        assert_eq!(
+            terms[0],
+            DiagramTerm::Comment {
+                content: "user journey",
+                posision: (17, 31)
+            }
+        );
+        assert_eq!(terms[1], DiagramTerm::Journey((48, 55)));
+        assert_eq!(
+            terms[2],
+            DiagramTerm::Title {
+                content: "Daily tasks",
+                posision: (72, 89)
+            }
+        );
+        assert_eq!(
+            terms[3],
+            DiagramTerm::JourneyEntry {
+                name: "Take a bread",
+                value: 5.0,
+                users: vec!["Me"],
+                position: (106, 125)
+            }
+        );
+        assert_eq!(
+            terms[4],
+            DiagramTerm::JourneySection {
+                name: "At the office",
+                position: (142, 163)
+            }
+        );
+        assert_eq!(
+            terms[5],
+            DiagramTerm::JourneyEntry {
+                name: "sleep",
+                value: 0.1,
+                users: vec![],
+                position: (180, 190)
+            }
+        );
+    }
+
+    #[test]
+    fn pie() {
         let terms = parse(
             r#"
                 # pie chart
@@ -63,15 +117,9 @@ mod pie_chart_test {
             }
         );
     }
-}
-
-#[cfg(test)]
-mod info_test {
-    use crate::parse;
-    use crate::DiagramTerm;
 
     #[test]
-    fn show_info() {
+    fn info() {
         let terms = parse("info showInfo # comment").unwrap();
         assert_eq!(terms[0], DiagramTerm::Info((0, 4)));
         assert_eq!(terms[1], DiagramTerm::ShowInfo((5, 13)));
